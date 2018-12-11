@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 import Life from './util/GameOfLife';
 
 const App = props => {
@@ -15,60 +15,70 @@ const App = props => {
     const ctx = canvas.current.getContext('2d');
     ctx.lineWidth = 2;
     ctx.strokeStyle = '#696969';
-    for (let i = 0, l = height; i < l + iterator; i += iterator) {
+    ctx.clearRect(0, 0, width, height);
+
+    console.log('animate, currentGen: ', currentGen);
+
+    for (let i = 15, l = height; i < l + iterator; i += iterator) {
       ctx.moveTo(i, 0);
       ctx.lineTo(i, height);
-      for (let j = 0, l = width; j < l + iterator; j += iterator) {
-        if (currentGen[i % iterator][j % iterator].alive) {
-          ctx.fillRect(i, j, iterator - 1, iterator - 1);
-        }
+      for (let j = 15, l = width; j < l + iterator; j += iterator) {
         ctx.moveTo(0, j);
         ctx.lineTo(i, j);
+        if (currentGen[i / iterator - 1][height / iterator - 1].alive) {
+          ctx.fillRect(i + 2, j + 2, iterator - 4, iterator - 4);
+        }
       }
     }
+
     ctx.stroke();
+
     if (shouldanimate) {
-      setCurrentGen(game.nextGen());
+      const newGrid = game.nextGen(currentGen);
+      console.log('newgrid: ', newGrid);
+      setCurrentGen(newGrid);
       requestAnimationFrame(timestamp => animate(timestamp));
     }
   };
 
-  useEffect(() => {
-    setTimestamp(Date.now() - timestamp);
-    let animationFrameId = requestAnimationFrame(() => {
-      animate(timestamp);
-    });
+  useLayoutEffect(
+    () => {
+      setTimestamp(Date.now() - timestamp);
+      let animationFrameId = requestAnimationFrame(() => {
+        animate(timestamp);
+      });
 
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
+      return () => cancelAnimationFrame(animationFrameId);
+    },
+    [currentGen]
+  );
 
   const determinePosition = e => {
-    const pos = document
-      .getElementsByTagName('canvas')[0]
-      .getBoundingClientRect();
+    const pos = canvas.current.getBoundingClientRect();
     const ctx = canvas.current.getContext('2d');
+
     const xAxis = Math.floor((e.clientX - pos.x) / iterator);
     const yAxis = Math.floor((e.clientY - pos.y) / iterator);
-    const cell = currentGen[xAxis][yAxis];
-    cell.toggleState();
-    if (cell.alive) {
+
+    currentGen[xAxis][yAxis].toggleState();
+    console.log('alive?!: ', currentGen[xAxis][yAxis].alive);
+    if (currentGen[xAxis][yAxis].alive) {
       ctx.fillStyle = '#000';
       ctx.fillRect(
-        e.clientX - pos.x - ((e.clientX - pos.x) % iterator),
-        e.clientY - pos.y - ((e.clientY - pos.y) % iterator),
-        iterator - 1,
-        iterator - 1
+        e.clientX - pos.x - ((e.clientX - pos.x) % iterator) + 2,
+        e.clientY - pos.y - ((e.clientY - pos.y) % iterator) + 2,
+        iterator - 4,
+        iterator - 4
       );
     } else {
       ctx.fillStyle = '#FFF';
       ctx.fillRect(
-        e.clientX - pos.x - ((e.clientX - pos.x) % iterator),
-        e.clientY - pos.y - ((e.clientY - pos.y) % iterator),
-        iterator - 1,
-        iterator - 1
+        e.clientX - pos.x - ((e.clientX - pos.x) % iterator) + 2,
+        e.clientY - pos.y - ((e.clientY - pos.y) % iterator) + 2,
+        iterator - 4,
+        iterator - 4
       );
     }
-    console.log(currentGen);
   };
 
   return (
@@ -82,6 +92,9 @@ const App = props => {
       />
       <button onClick={shouldanimate => setShouldanimate(!shouldanimate)}>
         Play!
+      </button>
+      <button onClick={() => setCurrentGen(game.nextGen(currentGen))}>
+        Next!
       </button>
     </>
   );
