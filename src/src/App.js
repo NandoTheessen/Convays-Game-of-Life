@@ -5,7 +5,7 @@ const App = props => {
   const [width, setWidth] = useState(300);
   const [shouldanimate, setShouldanimate] = useState(false);
   const [timestamp, setTimestamp] = useState(Date.now());
-  const canvasRef = useCanvas();
+  const canvas = useCanvas();
 
   const animate = timestamp => {
     if (shouldanimate) {
@@ -19,7 +19,7 @@ const App = props => {
     console.log(e.clientX - pos.x, e.clientY - pos.y);
     const xAxis = Math.floor((e.clientX - pos.x) / 15);
     const yAxis = Math.floor((e.clientY - pos.y) / 15);
-    const ctx = canvasRef.current.getContext('2d');
+    const ctx = canvas.current.getContext('2d');
 
     ctx.fillRect(
       e.clientX - pos.x - ((e.clientX - pos.x) % 15),
@@ -30,10 +30,10 @@ const App = props => {
     console.log(xAxis, yAxis);
   };
 
-  console.log(canvasRef);
+  console.log(canvas);
   return (
     <canvas
-      ref={canvasRef}
+      ref={canvas}
       style={{ border: '1px solid black', marginTop: '200px' }}
       height={height}
       width={width}
@@ -41,20 +41,18 @@ const App = props => {
     />
   );
   function useCanvas(context = '2d') {
-    const canvasRef = useRef(null);
+    const canvas = useRef(null);
 
     useEffect(() => {
-      const ctx = canvasRef.current.getContext(context);
-      ctx.beginPath();
+      const ctx = canvas.current.getContext(context);
       ctx.lineWidth = 0.1;
       ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-      for (let i = 15, l = 300; i < l; i += 15) {
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, 300);
-        ctx.stroke();
-        for (let j = 15, l = height; j < l; j += 15) {
+      for (let i = 15, l = 500; i < l; i += 15) {
+        for (let j = 15, l = 500; j < l; j += 15) {
+          ctx.moveTo(i, 0);
+          ctx.lineTo(i, j);
           ctx.moveTo(0, j);
-          ctx.lineTo(300, j);
+          ctx.lineTo(i, j);
           ctx.stroke();
         }
       }
@@ -65,7 +63,7 @@ const App = props => {
       return () => cancelAnimationFrame(animationFrameId);
     }, []);
 
-    return canvasRef;
+    return canvas;
   }
 };
 
