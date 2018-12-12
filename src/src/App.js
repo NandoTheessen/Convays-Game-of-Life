@@ -1,14 +1,16 @@
 import React, { useState, useLayoutEffect, useRef } from 'react';
 import Life from './util/GameOfLife';
 
-const App = props => {
+const App = () => {
   const game = new Life(0, 15, 300);
   const width = 300;
   const height = 300;
+
   const [iterator, setIterator] = useState(15);
   const [shouldanimate, setShouldanimate] = useState(false);
   const [timestamp, setTimestamp] = useState(Date.now());
-  const [currentGen, setCurrentGen] = useState(game.inializeGen());
+  const [currentGen, setCurrentGen] = useState(() => game.inializeGen());
+
   const canvas = useRef(null);
 
   const animate = () => {
@@ -17,15 +19,16 @@ const App = props => {
     ctx.strokeStyle = '#696969';
     ctx.clearRect(0, 0, width, height);
 
-    console.log('animate, currentGen: ', currentGen);
+    console.log('animate: ', currentGen);
 
-    for (let i = 15, l = height; i < l + iterator; i += iterator) {
+    for (let i = 0, l = height - iterator; i < l + iterator; i += iterator) {
       ctx.moveTo(i, 0);
       ctx.lineTo(i, height);
-      for (let j = 15, l = width; j < l + iterator; j += iterator) {
+      for (let j = 0, l = width - iterator; j < l + iterator; j += iterator) {
         ctx.moveTo(0, j);
-        ctx.lineTo(i, j);
-        if (currentGen[i / iterator - 1][height / iterator - 1].alive) {
+        ctx.lineTo(width, j);
+        if (currentGen[i / iterator][j / iterator].alive) {
+          // console.log('X', i / iterator, 'Y', j / iterator);
           ctx.fillRect(i + 2, j + 2, iterator - 4, iterator - 4);
         }
       }
@@ -34,9 +37,7 @@ const App = props => {
     ctx.stroke();
 
     if (shouldanimate) {
-      const newGrid = game.nextGen(currentGen);
-      console.log('newgrid: ', newGrid);
-      setCurrentGen(newGrid);
+      setCurrentGen(() => game.nextGen(currentGen));
       requestAnimationFrame(timestamp => animate(timestamp));
     }
   };
@@ -81,6 +82,11 @@ const App = props => {
     }
   };
 
+  const createNewGen = () => {
+    console.log('currentgen', currentGen);
+    setCurrentGen(() => game.nextGen(currentGen));
+  };
+
   return (
     <>
       <canvas
@@ -93,9 +99,7 @@ const App = props => {
       <button onClick={shouldanimate => setShouldanimate(!shouldanimate)}>
         Play!
       </button>
-      <button onClick={() => setCurrentGen(game.nextGen(currentGen))}>
-        Next!
-      </button>
+      <button onClick={createNewGen}>Next!</button>
     </>
   );
 };
