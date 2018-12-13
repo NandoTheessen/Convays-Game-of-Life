@@ -25,17 +25,17 @@ class Life {
             }
           }
         }
-        if (currentGen)
-          if (sum === 3 && !currentGen[x][y].alive) {
-            newGen[x][y].toggleState();
-          } else if (sum > 2 && sum < 4 && currentGen[x][y].alive) {
-            newGen[x][y].toggleState();
-          } else if (
-            (sum === 2 && currentGen[x][y].alive) ||
-            (sum === 3 && currentGen[x][y].alive)
-          ) {
-            newGen[x][y].toggleState();
-          }
+
+        if (sum === 3 && !currentGen[x][y].alive) {
+          newGen[x][y].toggleState();
+        } else if (sum > 2 && sum < 4 && currentGen[x][y].alive) {
+          newGen[x][y].toggleState();
+        } else if (
+          (sum === 2 && currentGen[x][y].alive) ||
+          (sum === 3 && currentGen[x][y].alive)
+        ) {
+          newGen[x][y].toggleState();
+        }
       }
     }
     return newGen;

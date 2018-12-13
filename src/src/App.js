@@ -8,7 +8,7 @@ const App = () => {
 
   const game = new Life(0, iterator, width);
   const [shouldanimate, setShouldanimate] = useState(false);
-  const [timer, setTimer] = useState(20);
+  const [timer, setTimer] = useState(10);
   const [currentGen, setCurrentGen] = useState(() => game.inializeGen());
 
   const canvas = useRef(null);
@@ -35,9 +35,7 @@ const App = () => {
 
     if (shouldanimate) {
       setTimeout(() => {
-        requestAnimationFrame(() =>
-          setCurrentGen(() => game.nextGen(currentGen))
-        );
+        setCurrentGen(() => game.nextGen(currentGen));
       }, timer);
     }
   };
