@@ -3,19 +3,20 @@ import Life from './util/GameOfLife';
 import Reducer from './util/Reducer';
 
 const App = () => {
-  const game = new Life(0, 10, 500);
+  const game = new Life(5, 500);
   const canvas = useRef(null);
 
-  const [{ size, timer, run, currentGen, iterator }, dispatch] = useReducer(
-    Reducer,
-    {
-      size: 500,
-      timer: 30,
-      run: false,
-      currentGen: game.inializeGen(),
-      iterator: 10
-    }
-  );
+  const [
+    { size, timer, run, currentGen, iterator, gen },
+    dispatch
+  ] = useReducer(Reducer, {
+    size: 500,
+    timer: 30,
+    run: false,
+    currentGen: game.inializeGen(),
+    iterator: 10,
+    gen: 0
+  });
 
   useEffect(
     () => {
@@ -31,7 +32,7 @@ const App = () => {
   return (
     <>
       <h1>Conways Game of Life</h1>
-      <p>Generation: {game.generation}</p>
+      <p>Generation: {gen}</p>
       <canvas
         ref={canvas}
         style={{

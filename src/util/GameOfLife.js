@@ -1,14 +1,12 @@
 class Life {
-  constructor(generation, iterator, width) {
-    this.generation = generation;
+  constructor(iterator, size) {
     this.iterator = iterator;
+    this.size = size;
     this.data = [];
-    this.width = width;
   }
 
   nextGen = currentGen => {
     const newGen = this.inializeGen();
-    this.generation++;
     const length = currentGen.length;
     for (let x = 0, l = currentGen.length; x < l; x++) {
       for (let y = 0, l = currentGen[x].length; y < l; y++) {
@@ -41,7 +39,7 @@ class Life {
     return newGen;
   };
   inializeGen = () => {
-    const size = Math.floor(this.width / this.iterator);
+    const size = Math.floor(this.size / this.iterator);
     this.data = new Array(size).fill(0).map(x => new Array(size).fill(0));
 
     for (let x = 0, l = size; x < l; x++) {
@@ -52,7 +50,7 @@ class Life {
     return this.data;
   };
   clearGrid = () => {
-    const size = Math.floor(this.width / this.iterator);
+    const size = Math.floor(this.size / this.iterator);
     this.data = new Array(size).fill(0).map(x => new Array(size).fill(0));
     for (let x = 0, l = size; x < l; x++) {
       for (let y = 0; y < l; y++) {
@@ -62,7 +60,7 @@ class Life {
     return this.data;
   };
   randomizeGrid = () => {
-    const size = Math.floor(this.width / this.iterator);
+    const size = Math.floor(this.size / this.iterator);
     this.clearGrid();
     for (let x = 0, l = size; x < l; x++) {
       for (let y = 0; y < l; y++) {

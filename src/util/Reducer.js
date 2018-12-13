@@ -3,17 +3,20 @@ function Reducer(state, action) {
     case 'NEXT_GEN':
       return {
         ...state,
-        currentGen: action.payload
+        currentGen: action.payload,
+        gen: (state.gen += 1)
       };
     case 'CLEAR_GRID':
       return {
         ...state,
-        currentGen: action.payload
+        currentGen: action.payload,
+        gen: 0
       };
     case 'RANDOMIZE':
       return {
         ...state,
-        currentGen: action.payload
+        currentGen: action.payload,
+        gen: 0
       };
     case 'START':
       return {
