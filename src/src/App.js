@@ -2,11 +2,11 @@ import React, { useState, useLayoutEffect, useRef } from 'react';
 import Life from './util/GameOfLife';
 
 const App = () => {
-  const game = new Life(0, 15, 300);
-  const width = 300;
-  const height = 300;
+  const [width, setWidth] = useState(500);
+  const [height, setHeight] = useState(500);
+  const [iterator, setIterator] = useState(20);
 
-  const [iterator, setIterator] = useState(15);
+  const game = new Life(0, 20, 500);
   const [shouldanimate, setShouldanimate] = useState(false);
   const [timestamp, setTimestamp] = useState(Date.now());
   const [currentGen, setCurrentGen] = useState(() => game.inializeGen());
@@ -37,16 +37,19 @@ const App = () => {
     ctx.stroke();
 
     if (shouldanimate) {
-      requestAnimationFrame(timestamp => animate(timestamp));
+      requestAnimationFrame(timestamp =>
+        setCurrentGen(() => game.nextGen(currentGen))
+      );
     }
   };
   const play = () => {
     setShouldanimate(!shouldanimate);
     setCurrentGen(() => game.nextGen(currentGen));
+    requestAnimationFrame(timestamp => animate(timestamp));
   };
   useLayoutEffect(
     () => {
-      setTimestamp(Date.now() - timestamp);
+      setTimestamp(() => timestamp + 30);
       let animationFrameId = requestAnimationFrame(() => {
         animate(timestamp);
       });
@@ -88,18 +91,34 @@ const App = () => {
     console.log('currentgen', currentGen);
     setCurrentGen(() => game.nextGen(currentGen));
   };
+  const clearGrid = () => {
+    const newgrid = game.clearGrid();
+    setCurrentGen(() => game.nextGen(newgrid));
+  };
+
+  const randomizeGrid = () => {
+    const newgrid = game.randomizeGrid();
+    setCurrentGen(() => game.nextGen(newgrid));
+  };
 
   return (
     <>
       <canvas
         ref={canvas}
-        style={{ border: '1px solid black', marginTop: '200px' }}
+        style={{
+          border: '1px solid black',
+          display: 'block',
+          margin: 'auto',
+          marginTop: '50px'
+        }}
         height={height}
         width={width}
         onClick={e => determinePosition(e)}
       />
       <button onClick={play}>{shouldanimate ? 'Stop!' : 'Play!'}</button>
       <button onClick={createNewGen}>Next!</button>
+      <button onClick={clearGrid}>clear!</button>
+      <button onClick={randomizeGrid}>Random!</button>
     </>
   );
 };

@@ -14,8 +14,8 @@ class Life {
         let sum = 0;
         for (let r = -1, l = 1; r <= l; r++) {
           for (let c = -1, l = 1; c <= l; c++) {
-            let dx = (x + r) % 20;
-            let dy = (y + c) % 20;
+            let dx = (x + r) % currentGen.length;
+            let dy = (y + c) % currentGen.length;
             if (dx < 0 || dy < 0) continue;
             let cell = currentGen[dx][dy];
 
@@ -43,9 +43,10 @@ class Life {
     return newGen;
   };
   inializeGen = () => {
-    this.data = new Array(20).fill(0).map(x => new Array(20).fill(0));
+    const size = this.width / this.iterator;
+    this.data = new Array(size).fill(0).map(x => new Array(size).fill(0));
 
-    for (let x = 0, l = this.data.length; x < l; x++) {
+    for (let x = 0, l = size; x < l; x++) {
       for (let y = 0; y < l; y++) {
         this.data[x][y] = new Cell();
       }
@@ -53,15 +54,30 @@ class Life {
     return this.data;
   };
   clearGrid = () => {
-    this.data = new Array(20).fill(0).map(x => new Array(20).fill(0));
-    for (let x = 0, l = this.data.length; x < l; x++) {
+    const size = this.width / this.iterator;
+    this.data = new Array(size).fill(0).map(x => new Array(size).fill(0));
+    for (let x = 0, l = size; x < l; x++) {
       for (let y = 0; y < l; y++) {
         this.data[x][y] = new Cell();
       }
     }
     return this.data;
   };
-  generateGeneration = () => {};
+  randomizeGrid = () => {
+    const size = this.width / this.iterator;
+    this.clearGrid();
+    for (let x = 0, l = size; x < l; x++) {
+      for (let y = 0; y < l; y++) {
+        const alive = Math.round(Math.random());
+        console.log(alive);
+        if (alive) {
+          this.data[x][y].toggleState();
+          continue;
+        }
+      }
+    }
+    return this.data;
+  };
 }
 
 class Cell {
