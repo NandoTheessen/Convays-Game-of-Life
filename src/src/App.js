@@ -4,22 +4,20 @@ import Life from './util/GameOfLife';
 const App = () => {
   const [width, setWidth] = useState(500);
   const [height, setHeight] = useState(500);
-  const [iterator, setIterator] = useState(20);
+  const [iterator, setIterator] = useState(10);
 
-  const game = new Life(0, 20, 500);
+  const game = new Life(0, iterator, width);
   const [shouldanimate, setShouldanimate] = useState(false);
-  const [timestamp, setTimestamp] = useState(Date.now());
+  const [timer, setTimer] = useState(20);
   const [currentGen, setCurrentGen] = useState(() => game.inializeGen());
 
   const canvas = useRef(null);
 
   const animate = () => {
     const ctx = canvas.current.getContext('2d');
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.strokeStyle = '#696969';
     ctx.clearRect(0, 0, width, height);
-
-    console.log('animate: ', currentGen);
 
     for (let i = 0, l = height - iterator; i < l + iterator; i += iterator) {
       ctx.moveTo(i, 0);
@@ -28,7 +26,6 @@ const App = () => {
         ctx.moveTo(0, j);
         ctx.lineTo(width, j);
         if (currentGen[i / iterator][j / iterator].alive) {
-          // console.log('X', i / iterator, 'Y', j / iterator);
           ctx.fillRect(i + 2, j + 2, iterator - 4, iterator - 4);
         }
       }
@@ -37,9 +34,11 @@ const App = () => {
     ctx.stroke();
 
     if (shouldanimate) {
-      requestAnimationFrame(timestamp =>
-        setCurrentGen(() => game.nextGen(currentGen))
-      );
+      setTimeout(() => {
+        requestAnimationFrame(() =>
+          setCurrentGen(() => game.nextGen(currentGen))
+        );
+      }, timer);
     }
   };
   const play = () => {
@@ -47,11 +46,11 @@ const App = () => {
     setCurrentGen(() => game.nextGen(currentGen));
     requestAnimationFrame(timestamp => animate(timestamp));
   };
+
   useLayoutEffect(
     () => {
-      setTimestamp(() => timestamp + 30);
       let animationFrameId = requestAnimationFrame(() => {
-        animate(timestamp);
+        animate();
       });
 
       return () => cancelAnimationFrame(animationFrameId);
@@ -67,7 +66,6 @@ const App = () => {
     const yAxis = Math.floor((e.clientY - pos.y) / iterator);
 
     currentGen[xAxis][yAxis].toggleState();
-    console.log('alive?!: ', currentGen[xAxis][yAxis].alive);
     if (currentGen[xAxis][yAxis].alive) {
       ctx.fillStyle = '#000';
       ctx.fillRect(
@@ -88,7 +86,6 @@ const App = () => {
   };
 
   const createNewGen = () => {
-    console.log('currentgen', currentGen);
     setCurrentGen(() => game.nextGen(currentGen));
   };
   const clearGrid = () => {
