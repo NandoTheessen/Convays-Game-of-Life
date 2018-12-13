@@ -1,12 +1,19 @@
-import React, { useState, useLayoutEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useRef, useReducer } from 'react';
 import Life from './util/GameOfLife';
 
 const App = () => {
+  const game = new Life(0, 10, 500);
   const [width, setWidth] = useState(500);
   const [height, setHeight] = useState(500);
   const [iterator, setIterator] = useState(10);
 
-  const game = new Life(0, iterator, width);
+  const [state, dispatch] = useReducer(reducer, {
+    size: 500,
+    timer: 30,
+    animate: false,
+    currentGen: game.inializeGen()
+  });
+
   const [shouldanimate, setShouldanimate] = useState(false);
   const [timer, setTimer] = useState(10);
   const [currentGen, setCurrentGen] = useState(() => game.inializeGen());
@@ -35,7 +42,7 @@ const App = () => {
 
     if (shouldanimate) {
       setTimeout(() => {
-        setCurrentGen(() => game.nextGen(currentGen));
+        dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
       }, timer);
     }
   };
@@ -64,23 +71,14 @@ const App = () => {
     const yAxis = Math.floor((e.clientY - pos.y) / iterator);
 
     currentGen[xAxis][yAxis].toggleState();
-    if (currentGen[xAxis][yAxis].alive) {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(
-        e.clientX - pos.x - ((e.clientX - pos.x) % iterator) + 2,
-        e.clientY - pos.y - ((e.clientY - pos.y) % iterator) + 2,
-        iterator - 4,
-        iterator - 4
-      );
-    } else {
-      ctx.fillStyle = '#FFF';
-      ctx.fillRect(
-        e.clientX - pos.x - ((e.clientX - pos.x) % iterator) + 2,
-        e.clientY - pos.y - ((e.clientY - pos.y) % iterator) + 2,
-        iterator - 4,
-        iterator - 4
-      );
-    }
+
+    ctx.fillStyle = currentGen[xAxis][yAxis].alive ? '#000' : '#FFF';
+    ctx.fillRect(
+      e.clientX - pos.x - ((e.clientX - pos.x) % iterator) + 2,
+      e.clientY - pos.y - ((e.clientY - pos.y) % iterator) + 2,
+      iterator - 4,
+      iterator - 4
+    );
   };
 
   const createNewGen = () => {
@@ -117,5 +115,34 @@ const App = () => {
     </>
   );
 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'NEXT_GEN':
+      return {
+        ...state,
+        currentGen: action.payload
+      };
+    case 'CLEAR_GRID':
+      return {
+        ...state,
+        currentGen: action.payload
+      };
+    case 'RANDOMIZE':
+      return {
+        ...state,
+        currentGen: action.payload
+      };
+    case 'START':
+      return {
+        ...state,
+        shouldanimate: !state.shouldanimate,
+        currentGen: action.payload
+      };
+
+    default:
+      break;
+  }
+}
 
 export default App;
