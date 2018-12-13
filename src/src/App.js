@@ -37,11 +37,13 @@ const App = () => {
     ctx.stroke();
 
     if (shouldanimate) {
-      setCurrentGen(() => game.nextGen(currentGen));
       requestAnimationFrame(timestamp => animate(timestamp));
     }
   };
-
+  const play = () => {
+    setShouldanimate(!shouldanimate);
+    setCurrentGen(() => game.nextGen(currentGen));
+  };
   useLayoutEffect(
     () => {
       setTimestamp(Date.now() - timestamp);
@@ -96,9 +98,7 @@ const App = () => {
         width={width}
         onClick={e => determinePosition(e)}
       />
-      <button onClick={shouldanimate => setShouldanimate(!shouldanimate)}>
-        Play!
-      </button>
+      <button onClick={play}>{shouldanimate ? 'Stop!' : 'Play!'}</button>
       <button onClick={createNewGen}>Next!</button>
     </>
   );

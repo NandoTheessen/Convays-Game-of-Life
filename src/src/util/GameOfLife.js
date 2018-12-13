@@ -7,23 +7,37 @@ class Life {
   }
 
   nextGen = currentGen => {
+    const newGen = this.inializeGen();
     this.generation++;
-    const newGen = currentGen.slice(0);
     for (let x = 0, l = currentGen.length; x < l; x++) {
       for (let y = 0, l = currentGen[x].length; y < l; y++) {
         let sum = 0;
-
-        //   console.log('X: ', x, 'Y: ', y);
         for (let r = -1, l = 1; r <= l; r++) {
           for (let c = -1, l = 1; c <= l; c++) {
-            //   console.log('X :', x + r, 'Y :', y + r, 'sum: ', sum);
+            let dx = (x + r) % 20;
+            let dy = (y + c) % 20;
+            if (dx < 0 || dy < 0) continue;
+            let cell = currentGen[dx][dy];
+
+            if (cell !== currentGen[x][y] && cell.alive) {
+              sum++;
+            }
           }
         }
-        if ((sum > 3 || sum < 2) && newGen[x][y].alive) {
-          newGen[x][y].toggleState();
-        } else if (sum === 3 && !newGen[x][y].alive) {
-          newGen[x][y].toggleState();
-        }
+        if (currentGen)
+          if (sum === 3 && !currentGen[x][y].alive) {
+            console.log(x, y, sum);
+            newGen[x][y].toggleState();
+          } else if (sum > 2 && sum < 4 && currentGen[x][y].alive) {
+            console.log(x, y, sum);
+            newGen[x][y].toggleState();
+          } else if (
+            (sum === 2 && currentGen[x][y].alive) ||
+            (sum === 3 && currentGen[x][y].alive)
+          ) {
+            console.log(x, y, sum);
+            newGen[x][y].toggleState();
+          }
       }
     }
     return newGen;
