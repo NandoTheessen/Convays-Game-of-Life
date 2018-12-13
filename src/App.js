@@ -4,6 +4,7 @@ import Reducer from './util/Reducer';
 
 const App = () => {
   const game = new Life(0, 10, 500);
+  const canvas = useRef(null);
 
   const [{ size, timer, run, currentGen, iterator }, dispatch] = useReducer(
     Reducer,
@@ -16,10 +17,43 @@ const App = () => {
     }
   );
 
-  const canvas = useRef(null);
+  useEffect(
+    () => {
+      let animationFrameId = requestAnimationFrame(() => {
+        draw();
+      });
 
-  const animate = () => {
-    console.log('fire animate', currentGen);
+      return () => cancelAnimationFrame(animationFrameId);
+    },
+    [currentGen]
+  );
+
+  return (
+    <>
+      <h1>Conways Game of Life</h1>
+      <p>Generation: {game.generation}</p>
+      <canvas
+        ref={canvas}
+        style={{
+          border: '1px solid black',
+          display: 'block',
+          margin: 'auto',
+          marginTop: '50px'
+        }}
+        height={size}
+        width={size}
+        onClick={e => determinePosition(e)}
+      />
+      <button onClick={play}>{run ? 'Stop!' : 'Play!'}</button>
+      <button onClick={createNewGen}>Next!</button>
+      <button onClick={clearGrid}>clear!</button>
+      <button onClick={randomizeGrid}>Random!</button>
+    </>
+  );
+  // ===================================================================
+  // Game Functionality
+
+  function draw() {
     const ctx = canvas.current.getContext('2d');
     ctx.lineWidth = 1;
     ctx.strokeStyle = '#696969';
@@ -44,28 +78,34 @@ const App = () => {
         dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
       }, timer);
     }
-  };
-  const play = () => {
+  }
+
+  function createNewGen() {
+    dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
+  }
+
+  function clearGrid() {
+    const newgrid = game.clearGrid();
+    dispatch({ type: 'CLEAR_GRID', payload: game.nextGen(newgrid) });
+  }
+
+  function randomizeGrid() {
+    const randomGrid = game.randomizeGrid();
+    dispatch({ type: 'RANDOMIZE', payload: randomGrid });
+  }
+
+  function play() {
     if (!run) {
       dispatch({ type: 'START', payload: game.nextGen(currentGen) });
-      animate();
+      draw();
     } else {
       dispatch({ type: 'STOP' });
     }
-  };
+  }
+  // ===================================================================
+  // Grid Click Handler
 
-  useEffect(
-    () => {
-      let animationFrameId = requestAnimationFrame(() => {
-        animate();
-      });
-
-      return () => cancelAnimationFrame(animationFrameId);
-    },
-    [currentGen]
-  );
-
-  const determinePosition = e => {
+  function determinePosition(e) {
     const pos = canvas.current.getBoundingClientRect();
     const ctx = canvas.current.getContext('2d');
 
@@ -81,43 +121,7 @@ const App = () => {
       iterator - 4,
       iterator - 4
     );
-    console.log(currentGen);
-  };
-
-  const createNewGen = () => {
-    dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
-  };
-  const clearGrid = () => {
-    const newgrid = game.clearGrid();
-    dispatch({ type: 'CLEAR_GRID', payload: game.nextGen(newgrid) });
-  };
-
-  const randomizeGrid = () => {
-    const randomGrid = game.randomizeGrid();
-    console.log(randomGrid);
-    dispatch({ type: 'RANDOMIZE', payload: randomGrid });
-  };
-
-  return (
-    <>
-      <canvas
-        ref={canvas}
-        style={{
-          border: '1px solid black',
-          display: 'block',
-          margin: 'auto',
-          marginTop: '50px'
-        }}
-        height={size}
-        width={size}
-        onClick={e => determinePosition(e)}
-      />
-      <button onClick={play}>{run ? 'Stop!' : 'Play!'}</button>
-      <button onClick={createNewGen}>Next!</button>
-      <button onClick={clearGrid}>clear!</button>
-      <button onClick={randomizeGrid}>Random!</button>
-    </>
-  );
+  }
 };
 
 export default App;
