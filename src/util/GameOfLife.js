@@ -6,7 +6,7 @@ class Life {
   }
 
   nextGen = currentGen => {
-    const newGen = this.inializeGen();
+    const newGen = this.initialiseGen();
     const length = currentGen.length;
     for (let x = 0, l = currentGen.length; x < l; x++) {
       for (let y = 0, l = currentGen[x].length; y < l; y++) {
@@ -38,7 +38,7 @@ class Life {
     }
     return newGen;
   };
-  inializeGen = () => {
+  initialiseGen = () => {
     const size = Math.floor(this.size / this.iterator);
     this.data = new Array(size).fill(0).map(x => new Array(size).fill(0));
 
@@ -59,9 +59,10 @@ class Life {
     }
     return this.data;
   };
+
   randomizeGrid = () => {
     const size = Math.floor(this.size / this.iterator);
-    this.clearGrid();
+    this.initialiseGen();
     for (let x = 0, l = size; x < l; x++) {
       for (let y = 0; y < l; y++) {
         const alive = Math.round(Math.random());

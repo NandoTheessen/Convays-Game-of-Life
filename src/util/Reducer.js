@@ -16,18 +16,17 @@ function Reducer(state, action) {
       return {
         ...state,
         currentGen: action.payload,
-        gen: 0
+        gen: 1
       };
     case 'START':
       return {
         ...state,
-        run: !state.run,
-        currentGen: action.payload
+        running: true
       };
     case 'STOP':
       return {
         ...state,
-        run: !state.run
+        running: false
       };
     default:
       break;

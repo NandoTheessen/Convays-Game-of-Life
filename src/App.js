@@ -5,26 +5,22 @@ import Reducer from './util/Reducer';
 const App = () => {
   const game = new Life(5, 500);
   const canvas = useRef(null);
+  // let prevTimeStamp;
 
-  const [
-    { size, timer, run, currentGen, iterator, gen },
-    dispatch
-  ] = useReducer(Reducer, {
-    size: 500,
-    timer: 30,
-    run: false,
-    currentGen: game.inializeGen(),
-    iterator: 10,
-    gen: 0
-  });
+  const [{ size, running, currentGen, iterator, gen }, dispatch] = useReducer(
+    Reducer,
+    {
+      size: 500,
+      running: false,
+      currentGen: game.initialiseGen(),
+      iterator: 5,
+      gen: 0
+    }
+  );
 
   useEffect(
     () => {
-      let animationFrameId = requestAnimationFrame(() => {
-        draw();
-      });
-
-      return () => cancelAnimationFrame(animationFrameId);
+      draw();
     },
     [currentGen]
   );
@@ -45,19 +41,25 @@ const App = () => {
         width={size}
         onClick={e => determinePosition(e)}
       />
-      <button onClick={play}>{run ? 'Stop!' : 'Play!'}</button>
+      <button onClick={play}>{running ? 'Stop!' : 'Play!'}</button>
       <button onClick={createNewGen}>Next!</button>
       <button onClick={clearGrid}>clear!</button>
       <button onClick={randomizeGrid}>Random!</button>
     </>
   );
+
   // ===================================================================
   // Game Functionality
 
   function draw() {
+    // console.log('start draw', currentGen);
+    // if (!prevTimeStamp) {
+    //   prevTimeStamp = timestamp - 30;
+    // }
+
     const ctx = canvas.current.getContext('2d');
     ctx.lineWidth = 1;
-    ctx.strokeStyle = '#696969';
+    ctx.strokeStyle = '#d3d3d3';
     ctx.clearRect(0, 0, size, size);
 
     for (let i = 0, l = size - iterator; i < l + iterator; i += iterator) {
@@ -67,38 +69,41 @@ const App = () => {
         ctx.moveTo(0, j);
         ctx.lineTo(size, j);
         if (currentGen[i / iterator][j / iterator].alive) {
-          ctx.fillRect(i + 2, j + 2, iterator - 4, iterator - 4);
+          ctx.fillRect(i + 1, j + 1, iterator - 2, iterator - 2);
         }
       }
     }
-
     ctx.stroke();
 
-    if (run) {
-      setTimeout(() => {
-        dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
-      }, timer);
+    if (!running) {
+      return;
     }
+    dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
+    draw();
   }
 
   function createNewGen() {
     dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
+    draw();
+    // requestAnimationFrame(t => draw(t));
   }
 
   function clearGrid() {
-    const newgrid = game.clearGrid();
-    dispatch({ type: 'CLEAR_GRID', payload: game.nextGen(newgrid) });
+    dispatch({ type: 'CLEAR_GRID', payload: game.initialiseGen() });
+    draw();
+    // requestAnimationFrame(t => draw(t));
   }
 
   function randomizeGrid() {
-    const randomGrid = game.randomizeGrid();
-    dispatch({ type: 'RANDOMIZE', payload: randomGrid });
+    dispatch({ type: 'RANDOMIZE', payload: game.randomizeGrid() });
+    console.log(currentGen);
+
+    requestAnimationFrame(draw);
   }
 
   function play() {
-    if (!run) {
-      dispatch({ type: 'START', payload: game.nextGen(currentGen) });
-      draw();
+    if (!running) {
+      dispatch({ type: 'START' });
     } else {
       dispatch({ type: 'STOP' });
     }
