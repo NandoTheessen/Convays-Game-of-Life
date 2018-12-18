@@ -15,7 +15,8 @@ class Life {
           for (let c = -1, l = 1; c <= l; c++) {
             let dx = (x + r) % length;
             let dy = (y + c) % length;
-            if (dx < 0 || dy < 0) continue;
+            if (dx < 0 || dy < 0 || (dx === x && dy === y)) continue;
+            if ((x === 49 && dx < 48) || (y === 49 && dy < 48)) continue;
             let cell = currentGen[dx][dy];
 
             if (cell !== currentGen[x][y] && cell.alive) {
@@ -25,8 +26,6 @@ class Life {
         }
 
         if (sum === 3 && !currentGen[x][y].alive) {
-          newGen[x][y].toggleState();
-        } else if (sum > 2 && sum < 4 && currentGen[x][y].alive) {
           newGen[x][y].toggleState();
         } else if (
           (sum === 2 && currentGen[x][y].alive) ||
