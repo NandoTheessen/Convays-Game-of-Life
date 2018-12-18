@@ -3,7 +3,7 @@ import Life from './util/GameOfLife';
 import Reducer from './util/Reducer';
 
 const App = () => {
-  const game = new Life(5, 500);
+  const game = new Life(10, 500);
   const canvas = useRef(null);
   // let prevTimeStamp;
 
@@ -13,7 +13,7 @@ const App = () => {
       size: 500,
       running: false,
       currentGen: game.initialiseGen(),
-      iterator: 5,
+      iterator: 10,
       gen: 0
     }
   );
@@ -23,6 +23,7 @@ const App = () => {
 
   useEffect(
     () => {
+      console.log(currentGen);
       draw();
     },
     [currentGen]
@@ -56,7 +57,7 @@ const App = () => {
 
   function drawGrid() {
     const ctx = canvas.current.getContext('2d');
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 0.5;
     ctx.strokeStyle = '#d3d3d3';
 
     for (let i = 0, l = size - iterator; i < l + iterator; i += iterator) {
@@ -91,35 +92,31 @@ const App = () => {
         }
       }
     }
-
-    if (!running) {
-      return;
+    if (running) {
+      setTimeout(() => {
+        dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
+      }, 30);
     }
-    dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
-    draw();
+    return;
   }
 
   function createNewGen() {
     dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
-    // requestAnimationFrame(t => draw(t));
   }
 
   function clearGrid() {
     dispatch({ type: 'CLEAR_GRID', payload: game.initialiseGen() });
-    draw();
     // requestAnimationFrame(t => draw(t));
   }
 
   function randomizeGrid() {
     dispatch({ type: 'RANDOMIZE', payload: game.randomizeGrid() });
-    console.log(currentGen);
-
-    requestAnimationFrame(draw);
   }
 
   function play() {
     if (!running) {
       dispatch({ type: 'START' });
+      dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
     } else {
       dispatch({ type: 'STOP' });
     }
