@@ -17,6 +17,9 @@ const App = () => {
       gen: 0
     }
   );
+  useEffect(() => {
+    drawGrid();
+  }, []);
 
   useEffect(
     () => {
@@ -51,6 +54,22 @@ const App = () => {
   // ===================================================================
   // Game Functionality
 
+  function drawGrid() {
+    const ctx = canvas.current.getContext('2d');
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#d3d3d3';
+
+    for (let i = 0, l = size - iterator; i < l + iterator; i += iterator) {
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, size);
+      for (let j = 0, l = size - iterator; j < l + iterator; j += iterator) {
+        ctx.moveTo(0, j);
+        ctx.lineTo(size, j);
+      }
+    }
+    ctx.stroke();
+  }
+
   function draw() {
     // console.log('start draw', currentGen);
     // if (!prevTimeStamp) {
@@ -60,20 +79,18 @@ const App = () => {
     const ctx = canvas.current.getContext('2d');
     ctx.lineWidth = 1;
     ctx.strokeStyle = '#d3d3d3';
-    ctx.clearRect(0, 0, size, size);
 
     for (let i = 0, l = size - iterator; i < l + iterator; i += iterator) {
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i, size);
       for (let j = 0, l = size - iterator; j < l + iterator; j += iterator) {
-        ctx.moveTo(0, j);
-        ctx.lineTo(size, j);
         if (currentGen[i / iterator][j / iterator].alive) {
+          ctx.fillStyle = '#000';
+          ctx.fillRect(i + 1, j + 1, iterator - 2, iterator - 2);
+        } else {
+          ctx.fillStyle = '#FFF';
           ctx.fillRect(i + 1, j + 1, iterator - 2, iterator - 2);
         }
       }
     }
-    ctx.stroke();
 
     if (!running) {
       return;
@@ -84,7 +101,6 @@ const App = () => {
 
   function createNewGen() {
     dispatch({ type: 'NEXT_GEN', payload: game.nextGen(currentGen) });
-    draw();
     // requestAnimationFrame(t => draw(t));
   }
 
