@@ -3,9 +3,9 @@ import Life from './util/GameOfLife';
 import Reducer from './util/Reducer';
 
 const App = () => {
-  const game = new Life(10, 500);
+  const initialCellSize = 5;
+  const game = new Life(initialCellSize, 500);
   const canvas = useRef(null);
-  // let prevTimeStamp;
 
   const [{ size, running, currentGen, iterator, gen }, dispatch] = useReducer(
     Reducer,
@@ -13,17 +13,19 @@ const App = () => {
       size: 500,
       running: false,
       currentGen: game.initialiseGen(),
-      iterator: 10,
+      iterator: initialCellSize,
       gen: 0
     }
   );
+  // useEffect running on mount responsible for drawing the grid
   useEffect(() => {
     drawGrid();
   }, []);
 
+  // useEffect used to update the grid based on changes to the current Generation
+  // of cells
   useEffect(
     () => {
-      console.log(currentGen);
       draw();
     },
     [currentGen]
@@ -85,10 +87,10 @@ const App = () => {
       for (let j = 0, l = size - iterator; j < l + iterator; j += iterator) {
         if (currentGen[i / iterator][j / iterator].alive) {
           ctx.fillStyle = '#000';
-          ctx.fillRect(i + 1, j + 1, iterator - 2, iterator - 2);
+          ctx.fillRect(i + 2, j + 2, iterator - 3, iterator - 3);
         } else {
           ctx.fillStyle = '#FFF';
-          ctx.fillRect(i + 1, j + 1, iterator - 2, iterator - 2);
+          ctx.fillRect(i + 2, j + 2, iterator - 3, iterator - 3);
         }
       }
     }
