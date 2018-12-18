@@ -15,6 +15,7 @@ function Reducer(state, action) {
     case 'RANDOMIZE':
       return {
         ...state,
+        running: false,
         currentGen: action.payload,
         gen: 1
       };

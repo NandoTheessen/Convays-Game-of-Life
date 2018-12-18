@@ -74,11 +74,7 @@ const App = () => {
   }
 
   function draw() {
-    // console.log('start draw', currentGen);
-    // if (!prevTimeStamp) {
-    //   prevTimeStamp = timestamp - 30;
-    // }
-
+    console.log(currentGen);
     const ctx = canvas.current.getContext('2d');
     ctx.lineWidth = 1;
     ctx.strokeStyle = '#d3d3d3';
@@ -107,7 +103,10 @@ const App = () => {
   }
 
   function clearGrid() {
-    dispatch({ type: 'CLEAR_GRID', payload: game.initialiseGen() });
+    dispatch({ type: 'STOP' });
+    setTimeout(() => {
+      dispatch({ type: 'CLEAR_GRID', payload: game.initialiseGen() });
+    }, 50);
     // requestAnimationFrame(t => draw(t));
   }
 
@@ -132,15 +131,18 @@ const App = () => {
 
     const xAxis = Math.floor((e.clientX - pos.x) / iterator);
     const yAxis = Math.floor((e.clientY - pos.y) / iterator);
-
+    console.log(xAxis, yAxis);
+    if (xAxis === 100 || yAxis === 100) {
+      return;
+    }
     currentGen[xAxis][yAxis].toggleState();
 
     ctx.fillStyle = currentGen[xAxis][yAxis].alive ? '#000' : '#FFF';
     ctx.fillRect(
       e.clientX - pos.x - ((e.clientX - pos.x) % iterator) + 2,
       e.clientY - pos.y - ((e.clientY - pos.y) % iterator) + 2,
-      iterator - 4,
-      iterator - 4
+      iterator - 3,
+      iterator - 3
     );
   }
 };
