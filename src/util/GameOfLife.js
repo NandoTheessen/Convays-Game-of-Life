@@ -16,7 +16,7 @@ class Life {
             let dx = (x + r) % length;
             let dy = (y + c) % length;
             if (dx < 0 || dy < 0 || (dx === x && dy === y)) continue;
-            if ((x === 49 && dx < 48) || (y === 49 && dy < 48)) continue;
+            // if ((x === 49 && dx < 48) || (y === 49 && dy < 48)) continue;
             let cell = currentGen[dx][dy];
 
             if (cell !== currentGen[x][y] && cell.alive) {
@@ -37,6 +37,7 @@ class Life {
     }
     return newGen;
   };
+
   initialiseGen = () => {
     const size = Math.floor(this.size / this.iterator);
     this.data = new Array(size).fill(0).map(x => new Array(size).fill(0));
@@ -48,6 +49,7 @@ class Life {
     }
     return this.data;
   };
+
   clearGrid = () => {
     const size = Math.floor(this.size / this.iterator);
     this.data = new Array(size).fill(0).map(x => new Array(size).fill(0));

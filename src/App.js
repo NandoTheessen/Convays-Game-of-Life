@@ -3,7 +3,7 @@ import Life from './util/GameOfLife';
 import Reducer from './util/Reducer';
 
 const App = () => {
-  const initialCellSize = 5;
+  const initialCellSize = 25;
   const game = new Life(initialCellSize, 500);
   const canvas = useRef(null);
 
@@ -59,8 +59,9 @@ const App = () => {
 
   function drawGrid() {
     const ctx = canvas.current.getContext('2d');
-    ctx.lineWidth = 0.5;
-    ctx.strokeStyle = '#d3d3d3';
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#000';
+    ctx.globalAlpha = 1;
 
     for (let i = 0, l = size - iterator; i < l + iterator; i += iterator) {
       ctx.moveTo(i, 0);
@@ -74,10 +75,8 @@ const App = () => {
   }
 
   function draw() {
-    console.log(currentGen);
     const ctx = canvas.current.getContext('2d');
     ctx.lineWidth = 1;
-    ctx.strokeStyle = '#d3d3d3';
 
     for (let i = 0, l = size - iterator; i < l + iterator; i += iterator) {
       for (let j = 0, l = size - iterator; j < l + iterator; j += iterator) {
@@ -107,7 +106,6 @@ const App = () => {
     setTimeout(() => {
       dispatch({ type: 'CLEAR_GRID', payload: game.initialiseGen() });
     }, 50);
-    // requestAnimationFrame(t => draw(t));
   }
 
   function randomizeGrid() {
@@ -131,7 +129,6 @@ const App = () => {
 
     const xAxis = Math.floor((e.clientX - pos.x) / iterator);
     const yAxis = Math.floor((e.clientY - pos.y) / iterator);
-    console.log(xAxis, yAxis);
     if (xAxis === 100 || yAxis === 100) {
       return;
     }
